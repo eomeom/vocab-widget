@@ -35,6 +35,7 @@ router.get("/", async (req, res) => {
   const lang = (req.query.lang || "en").toLowerCase();
 
   if (!SUPPORTED_LANGS.includes(lang)) {
+
     return res.status(400).json({
       error: "Unsupported language",
       supported: SUPPORTED_LANGS
@@ -46,6 +47,10 @@ router.get("/", async (req, res) => {
   // ---- Chinese ----
   if (lang === "zh") {
     const word = pickHourlyItem(ZH_WORDS);
+
+    // Set caching headers for 1 hour
+
+    res.set("Cache-Control", "public, max-age=3600");
 
     return res.json({
       lang: "zh",
@@ -74,6 +79,10 @@ router.get("/", async (req, res) => {
     const definition =
       data[0]?.meanings?.[0]?.definitions?.[0]?.definition ||
       "Definition not found";
+
+    // Set caching headers for 1 hour
+    res.set("Cache-Control", "public, max-age=3600");
+
 
     res.json({
       lang: "en",
