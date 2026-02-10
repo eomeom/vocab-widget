@@ -1,63 +1,102 @@
 import { useEffect, useState } from "react";
 import Widget from "./Widget";
-import { getWord } from "./api";
-
-function getLangFromURL() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("lang") || "en";
-}
 
 export default function App() {
-  const lang = getLangFromURL();
-
   const [data, setData] = useState(null);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+const params = new URLSearchParams(window.location.search);
+const lang = params.get("lang") || "en";
 
   useEffect(() => {
-    setData(null);
-    setError(false);
+    setLoading(true);
+    setError(null);
 
-    getWord(lang)
-      .then(setData)
-      .catch(() => setError(true));
+    fetch(`${import.meta.env.VITE_API_BASE}/vocab?lang=${lang}`)
+      .then(res => {
+        if (!res.ok) throw new Error("API error");
+        return res.json();
+      })
+      .then(json => setData(json))
+      .catch(() => setError("Unable to load word"))
+      .finally(() => setLoading(false));
   }, [lang]);
 
+  if (loading) {
+    return <div className="widget-container">Loading word…</div>;
+  }
+
   if (error) {
-    return (
-      <Widget data={data} />
-    );
+    return <div className="widget-container error">{error}</div>;
   }
 
-  if (!data) {
-    return (
-      <Widget data={data} />
-    );
-  }
-
-  return (
-    <Widget data={data} />
-  );
+  return <Widget data={data} />;
 }
 
 
-// // testing stub version
+// // Revised version using api.js
+
+// import { useEffect, useState } from "react";
 // import Widget from "./Widget";
+// import { getWord } from "./api";
 
 // function getLangFromURL() {
-//   const params = new URLSearchParams(window.location.search);
+  // const params = new URLSearchParams(window.location.search);
 //   return params.get("lang") || "en";
 // }
 
 // export default function App() {
 //   const lang = getLangFromURL();
 
-//   // Temporary stub data (we remove this later)
-//   const data = {
-//     language: lang.toUpperCase(),
-//     word: "loading",
-//     pronunciation: "",
-//     definition: "loading"
-//   };
+//   const [data, setData] = useState(null);
+//   const [error, setError] = useState(false);
 
-//   return <Widget {...data} />;
+//   useEffect(() => {
+//     setData(null);
+//     setError(false);
+
+//     getWord(lang)
+//       .then(setData)
+//       .catch(() => setError(true));
+//   }, [lang]);
+
+//   if (error) {
+//     return (
+//       <Widget data={data} />
+//     );
+//   }
+
+//   if (!data) {
+//     return (
+//       <Widget data={data} />
+//     );
+//   }
+
+//   return (
+//     <Widget data={data} />
+//   );
 // }
+
+
+// // // testing stub version
+// // import Widget from "./Widget";
+
+// // function getLangFromURL() {
+// //   const params = new URLSearchParams(window.location.search);
+// //   return params.get("lang") || "en";
+// // }
+
+// // export default function App() {
+// //   const lang = getLangFromURL();
+
+// //   // Temporary stub data (we remove this later)
+// //   const data = {
+// //     language: lang.toUpperCase(),
+// //     word: "loading",
+// //     pronunciation: "",
+// //     definition: "loading"
+// //   };
+
+// //   return <Widget {...data} />;
+// // }
