@@ -39,6 +39,7 @@ function baseResponse({ lang, term, definition, source }) {
   };
 }
 
+
 router.get("/", async (req, res) => {
   const lang = (req.query.lang || "en").toLowerCase();
 
@@ -50,7 +51,11 @@ router.get("/", async (req, res) => {
   }
 
   // shared cache header
-  res.set("Cache-Control", "public, max-age=3600");
+   res.set("Cache-Control", "public, max-age=3600");
+  //res.set("Cache-Control", "no-store");
+
+  // vary by language
+  res.set("Vary", "lang");
 
   // ---- Chinese ----
   if (lang === "zh") {
@@ -98,6 +103,16 @@ router.get("/", async (req, res) => {
       error: "Upstream dictionary API failed"
     });
   }
+});
+
+// health check
+
+router.get("/health", (req, res) => {
+  res.json({
+    status: "ok",
+    service: "vocab-route",
+    timestamp: new Date().toISOString()
+  });
 });
 
 module.exports = router;

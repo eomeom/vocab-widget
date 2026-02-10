@@ -23,6 +23,14 @@ app.get("/", (req, res) => {
   res.send("Vocab Widget API is running");
 });
 
+// global health check
+app.get("/health", (req, res) => {
+  res.json({
+    status: "ok",
+    service: "vocab-api",
+    timestamp: new Date().toISOString()
+  });
+});
 
 // routes
 app.use("/vocab", vocabRoute);
