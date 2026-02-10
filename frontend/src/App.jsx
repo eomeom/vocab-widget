@@ -17,21 +17,50 @@ export default function App() {
   // Get lang from URL
   const lang = getLangFromURL();
 
-  useEffect(() => {
+  // Fetch function
+  const fetchWord = () => {
     setLoading(true);
     setError(null);
-    //setData(null);
 
     getWord(lang)
-      .then((wordData) => {
-        setData(wordData);
-      })
-      .catch(() => {
-        setError("Unable to load word");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      .then((wordData) => setData(wordData))
+      .catch(() => setError("Unable to load word"))
+      .finally(() => setLoading(false));
+  };
+
+    // How it works
+    // 1. Initial fetch: loads the current word when the component mounts.
+    // 2. First timeout: calculates how many milliseconds are left until the next hour, so the refresh aligns with your backend hourly rotation.
+    // 3. Subsequent intervals: after the first refresh, the word updates every hour exactly.
+    // 4. Cleanup: ensures no memory leaks if the component unmounts.
+
+
+    useEffect(() => {
+      
+      fetchWord();
+
+    // --- Hourly refresh ---
+    // Calculate ms until next hour
+    const now = new Date();
+    const msToNextHour =
+      (60 - now.getMinutes()) * 60 * 1000 -
+      now.getSeconds() * 1000 -
+      now.getMilliseconds();
+
+    const timeout = setTimeout(() => {
+      fetchWord();
+
+      // After first trigger, refresh every hour
+      const interval = setInterval(fetchWord, 60 * 60 * 1000);
+    
+      // Cleanup interval on unmount
+      return () => clearInterval(interval);
+    }, msToNextHour);
+
+    // Cleanup timeout on unmount
+    return () => clearTimeout(timeout);
+
+  }, [lang]);
 
     // // Fetch word data from API
     // fetch(`${import.meta.env.VITE_API_BASE}/vocab?lang=${lang}`)
@@ -44,15 +73,16 @@ export default function App() {
     //   //.catch(() => setError("Unable to load word"))
     //   .finally(() => setLoading(false));
 
-  }, [lang]);
-
-  if (loading) return <div className="widget-container">Loading word…</div>;
-
-  if (error)
+  if (loading) {
+    return <div className="widget-container">Loading word…</div>;
+  }
+  if (error) {
     return <div className="widget-container error">{error}</div>;
+  }
 
   return <Widget data={data} />;
 }
+
 
 
 // // Revised version using api.js
