@@ -1,0 +1,36 @@
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f6f6f6;
+}
+
+.widget-container {
+  max-width: 420px;
+  margin: 40px auto;
+  padding: 24px;
+  background: white;
+}
+
+.language {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.word {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.pronunciation {
+  font-size: 14px;
+  color: #444;
+  margin-bottom: 12px;
+}
+
+.definition {
+  font-size: 16px;
+  line-height: 1.4;
+}
