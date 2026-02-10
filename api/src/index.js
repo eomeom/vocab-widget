@@ -12,6 +12,12 @@ const PORT = process.env.PORT || 3000;
 // middleware
 app.use(express.json());
 
+// root endpoint
+app.get("/", (req, res) => {
+  res.send("Vocab Widget API is running");
+});
+
+
 // routes
 app.use("/vocab", vocabRoute);
 
