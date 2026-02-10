@@ -23,7 +23,7 @@ body {
 
 .word {
   font-size: 24px;
-  font-weight: /* 600;*/ bold;
+  font-weight:  600 /*bold*/;
   margin-bottom: 4px;
 }
 
