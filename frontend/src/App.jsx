@@ -1,17 +1,24 @@
 import { useEffect, useState } from "react";
 import Widget from "./Widget";
 
+// Helper to get lang param from URL
+function getLangFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return (params.get("lang") || "en").toLowerCase();
+}
+
 export default function App() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-const params = new URLSearchParams(window.location.search);
-const lang = params.get("lang") || "en";
+  // Get lang from URL
+  const lang = getLangFromURL();
 
   useEffect(() => {
     setLoading(true);
     setError(null);
+    setData(null);
 
     fetch(`${import.meta.env.VITE_API_BASE}/vocab?lang=${lang}`)
       .then(res => {
