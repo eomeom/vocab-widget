@@ -1,16 +1,9 @@
 const express = require("express");
-const fetch = require("node-fetch");
-
+const fetch = require("node-fetch"); // needed for EN dictionary API
 const router = express.Router();
 
-const EN_WORDS = [
-  "serendipity",
-  "ephemeral",
-  "lucid",
-  "resilient",
-  "nostalgia"
-];
-
+// --- Stub word lists ---
+const EN_WORDS = ["serendipity", "ephemeral", "lucid", "resilient", "nostalgia"];
 const ZH_WORDS = [
   { hanzi: "学习", pinyin: "xué xí", meaning: "to study; to learn" },
   { hanzi: "朋友", pinyin: "péng you", meaning: "friend" },
@@ -21,6 +14,7 @@ const ZH_WORDS = [
 
 const SUPPORTED_LANGS = ["en", "zh"];
 
+// --- Helpers/Utility Functions ---
 function pickHourlyItem(list) {
   const hour = Math.floor(Date.now() / 3600000);
   return list[hour % list.length];
@@ -39,80 +33,93 @@ function baseResponse({ lang, term, definition, source }) {
   };
 }
 
+// ----- Endpoints -----
 
+// --- Health check (/vocab/health)---
+router.get("/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
+// --- Main vocab endpoint (/vocab?lang=xx) ---
 router.get("/", async (req, res) => {
   const lang = (req.query.lang || "en").toLowerCase();
 
   if (!SUPPORTED_LANGS.includes(lang)) {
-    return res.status(400).json({
-      error: "Unsupported language",
-      supported: SUPPORTED_LANGS
+    return res.status(400).json({ 
+      error: "Unsupported language", 
+      supported: SUPPORTED_LANGS 
     });
   }
 
-  // shared cache header
-   res.set("Cache-Control", "public, max-age=3600");
-  //res.set("Cache-Control", "no-store");
-
-  // vary by language
+  // caching headers
+  res.set("Cache-Control", "public, max-age=3600"); //1 hour
   res.set("Vary", "lang");
 
-  // ---- Chinese ----
+  // --- Chinese ---
   if (lang === "zh") {
     const word = pickHourlyItem(ZH_WORDS);
-
     return res.json(
       baseResponse({
         lang: "zh",
-        term: {
-          text: word.hanzi,
-          pronunciation: word.pinyin
-        },
+        term: { text: word.hanzi, pronunciation: word.pinyin },
         definition: word.meaning,
         source: "cc-cedict (static)"
       })
     );
   }
 
-  // ---- English ----
+  // --- English ---
   const word = pickHourlyItem(EN_WORDS);
 
   try {
     const response = await fetch(
       `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
     );
+
+    if (!response.ok) {
+      // fallback if API fails
+      return res.json(
+        baseResponse({
+          lang: "en",
+          term: { text: word, pronunciation: null },
+          definition: "Definition temporarily unavailable",
+          source: "static fallback"
+        })
+      );
+    }
+    
+    // if (!response.ok) throw new Error("Dictionary API failed");
+
     const data = await response.json();
 
     const definition =
-      data?.[0]?.meanings?.[0]?.definitions?.[0]?.definition ||
-      "Definition not found";
+      data?.[0]?.meanings?.[0]?.definitions?.[0]?.definition || "Definition not found";
+
+    // Optional: get pronunciation if available
+    const pronunciation = data?.[0]?.phonetics?.[0]?.text || null;
 
     return res.json(
       baseResponse({
         lang: "en",
-        term: {
-          text: word,
-          pronunciation: null
-        },
+        term: { text: word, pronunciation },
         definition,
         source: "dictionaryapi.dev"
       })
     );
   } catch (err) {
-    return res.status(502).json({
-      error: "Upstream dictionary API failed"
-    });
-  }
-});
-
-// health check
-
-router.get("/health", (req, res) => {
-  res.json({
-    status: "ok",
-    service: "vocab-route",
-    timestamp: new Date().toISOString()
-  });
+    // fallback for network errors
+    return res.json(
+      baseResponse({
+        lang: "en",
+        term: { text: word, pronunciation: null },
+        definition: "Definition temporarily unavailable",
+        source: "static fallback"
+      })
+    );
+  }  
+    
+    //console.error(err); // log error
+    //return res.status(502).json({ error: "Upstream dictionary API failed" });  }
 });
 
 module.exports = router;

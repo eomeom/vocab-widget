@@ -1,16 +1,13 @@
 //required for widgets
 
-const cors = require("cors");
-
 const express = require("express");
-const app = express();
-
+const cors = require("cors");
 const vocabRoute = require("./routes/vocab");
 
-
-// const PORT = 3000;
+const app = express();
 // For Render to assign its own port
 const PORT = process.env.PORT || 3000;
+// const PORT = 3000;
 
 
 // middleware
@@ -23,6 +20,9 @@ app.get("/", (req, res) => {
   res.send("Vocab Widget API is running");
 });
 
+// routes
+app.use("/vocab", vocabRoute);
+
 // global health check
 app.get("/health", (req, res) => {
   res.json({
@@ -32,13 +32,10 @@ app.get("/health", (req, res) => {
   });
 });
 
-// routes
-app.use("/vocab", vocabRoute);
-
-// health check
-app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
-});
+// // health check
+// app.get("/health", (req, res) => {
+//   res.json({ status: "ok" });
+// });
 
 // start server
 app.listen(PORT, () => {
