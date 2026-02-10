@@ -16,7 +16,7 @@ body {
 }
 
 .language {
-  font-weight: bold;
+  font-weight: /*bold*/ lighter;
   font-size: 10px;
   margin-bottom: 8px;
 }
