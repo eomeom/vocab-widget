@@ -8,17 +8,17 @@ export default function Widget({ data }) {
       <div className="language">{lang.toUpperCase()}</div>
 
       <div className="word">
-        {data.term?.text || "-"}
+        {term?.text || "-"}
       </div>
 
-      {data.term?.pronunciation && (
+      {term?.pronunciation && (
         <div className="pronunciation">
           {term.pronunciation}
         </div>
       )}
 
       <div className="definition">
-        {definition}
+        {definition || "Definition not available."}
       </div>
     </div>
   );
