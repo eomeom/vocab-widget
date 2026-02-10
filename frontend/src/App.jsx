@@ -11,7 +11,7 @@ function getLangFromURL() {
 
 export default function App() {
   const [data, setData] = useState(null);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Get lang from URL
@@ -19,7 +19,7 @@ export default function App() {
 
   useEffect(() => {
     setLoading(true);
-    setError(false);
+    setError(null);
     //setData(null);
 
     getWord(lang)
@@ -27,7 +27,7 @@ export default function App() {
         setData(wordData);
       })
       .catch(() => {
-        setError(true);
+        setError("Unable to load word");
       })
       .finally(() => {
         setLoading(false);
@@ -49,7 +49,7 @@ export default function App() {
   if (loading) return <div className="widget-container">Loading word…</div>;
 
   if (error)
-    return <div className="widget-container error">Unable to load word.</div>;
+    return <div className="widget-container error">{error}</div>;
 
   return <Widget data={data} />;
 }

@@ -1,25 +1,22 @@
 export default function Widget({ data }) {
-  if (!data) return null;
+  if (!data) {
+    return (
+      <div className="widget-container">
+        Loading word…
+      </div>
+    );
+  }
 
     const { lang, term, definition } = data;
 
   return (
     <div className="widget-container">
       <div className="language">{lang.toUpperCase()}</div>
-
-      <div className="word">
-        {term?.text || "-"}
-      </div>
-
+      <div className="word">{term?.text || "-"}</div>
       {term?.pronunciation && (
-        <div className="pronunciation">
-          {term.pronunciation}
-        </div>
+        <div className="pronunciation">{term.pronunciation}</div>
       )}
-
-      <div className="definition">
-        {definition || "Definition not available."}
-      </div>
+      <div className="definition">{definition || "Definition not available."}</div>
     </div>
   );
 }
