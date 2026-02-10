@@ -1,5 +1,5 @@
 const express = require("express");
-const fetch = require("node-fetch"); // needed for EN dictionary API
+// const fetch = require("node-fetch"); // needed for EN dictionary API
 const router = express.Router();
 
 // --- Stub word lists ---
