@@ -2,6 +2,14 @@
 node_modules
 api/node_modules
 
+# Database and dataset
+data/
+*.db
+
+# Python cache
+__pycache__/
+*.pyc
+
 # build output
 .next
 dist
