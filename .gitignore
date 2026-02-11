@@ -22,3 +22,25 @@ dist
 
 # misc
 .DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Lock files (if you don't want them versioned)
+# Uncomment ONLY if you intentionally don't want lock files tracked
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
