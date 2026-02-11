@@ -1,16 +1,18 @@
+const db = require("../db");
+
 const express = require("express");
-// const fetch = require("node-fetch"); // needed for EN dictionary API
 const router = express.Router();
 
 // --- Stub word lists ---
 const EN_WORDS = ["serendipity", "ephemeral", "lucid", "resilient", "nostalgia"];
-const ZH_WORDS = [
-  { hanzi: "学习", pinyin: "xué xí", meaning: "to study; to learn" },
-  { hanzi: "朋友", pinyin: "péng you", meaning: "friend" },
-  { hanzi: "时间", pinyin: "shí jiān", meaning: "time" },
-  { hanzi: "机会", pinyin: "jī huì", meaning: "opportunity" },
-  { hanzi: "坚持", pinyin: "jiān chí", meaning: "to persist" }
-];
+
+// const ZH_WORDS = [
+//   { hanzi: "学习", pinyin: "xué xí", meaning: "to study; to learn" },
+//   { hanzi: "朋友", pinyin: "péng you", meaning: "friend" },
+//   { hanzi: "时间", pinyin: "shí jiān", meaning: "time" },
+//   { hanzi: "机会", pinyin: "jī huì", meaning: "opportunity" },
+//   { hanzi: "坚持", pinyin: "jiān chí", meaning: "to persist" }
+// ];
 
 const SUPPORTED_LANGS = ["en", "zh"];
 
@@ -57,16 +59,59 @@ router.get("/", async (req, res) => {
 
   // --- Chinese ---
   if (lang === "zh") {
-    const word = pickHourlyItem(ZH_WORDS);
+  try {
+    const hour = Math.floor(Date.now() / 3600000);
+
+    const countRow = db
+      .prepare("SELECT COUNT(*) as count FROM words WHERE language='zh'")
+      .get();
+
+    const total = countRow.count;
+    if (total === 0) {
+      return res.status(404).json({ error: "No words available" });
+    }
+
+
+    const offset = hour % total;
+
+    const row = db
+      .prepare("SELECT simplified, pinyin, definition FROM words WHERE language='zh' LIMIT 1 OFFSET ?")
+      .get(offset);
+
+    if (!row) {
+      return res.status(404).json({ error: "Word not found" });
+    }
+
     return res.json(
-      baseResponse({
-        lang: "zh",
-        term: { text: word.hanzi, pronunciation: word.pinyin },
-        definition: word.meaning,
-        source: "cc-cedict (static)"
-      })
-    );
+  baseResponse({
+    lang: "zh",
+    term: {
+      text: row.simplified,
+      pronunciation: row.pinyin
+    },
+    definition: row.definition,
+    source: "CC-CEDICT"
+  })
+);
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Database error" });
   }
+}
+
+  // // --- Static Chinese fallback ---
+  // if (lang === "zh") {
+  //   const word = pickHourlyItem(ZH_WORDS);
+  //   return res.json(
+  //     baseResponse({
+  //       lang: "zh",
+  //       term: { text: word.hanzi, pronunciation: word.pinyin },
+  //       definition: word.meaning,
+  //       source: "cc-cedict (static)"
+  //     })
+  //   );
+  // }
 
   // --- English ---
   const word = pickHourlyItem(EN_WORDS);
@@ -88,8 +133,6 @@ router.get("/", async (req, res) => {
       );
     }
     
-    // if (!response.ok) throw new Error("Dictionary API failed");
-
     const data = await response.json();
 
     const definition =
@@ -118,8 +161,6 @@ router.get("/", async (req, res) => {
     );
   }  
     
-    //console.error(err); // log error
-    //return res.status(502).json({ error: "Upstream dictionary API failed" });  }
 });
 
 module.exports = router;
