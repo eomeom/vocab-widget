@@ -1,57 +1,41 @@
-# Vocab Widget MVP
+# Vocab Widget
 
-A lightweight vocabulary widget API that serves rotating vocabulary
-across multiple languages for use in widgets, apps, and extensions.
-
-## Supported Languages (MVP)
-- English
-- Chinese (Simplified)
-- Korean
-- Malay (planned)
-- French (planned)
-
-## Features
-- Hourly vocabulary rotation
-- Multiple dictionary providers (API + scrape fallback)
-- Node.js backend
-- Python fetchers (future expansion)
-
-## Tech Stack
-- Node.js (Express)
-- Python (fetching & preprocessing)
-- GitHub
-- Future deployment: Render / Railway / Vercel
-
-## Running locally
-
-### Backend
-```bash
-cd api
-npm install
-npm run dev
-
-Server runs on:
-
-http://localhost:3000
-
-Health check:
-
-GET /health
-
-Roadmap
-
-- Vocabulary caching
-- Language toggle
-- Widget UI
-- Deployment
-- Rate limiting
-
-
-Save the file.
+A multilingual vocabulary widget MVP. Fetches words and definitions in multiple languages and displays them in a simple frontend widget.
 
 ---
 
-### Commit README
+## Features
+
+- English (EN) and Chinese (ZH) supported
+- Hourly word rotation
+- Definitions fetched from dictionary APIs (EN) and CC-CEDICT (ZH)
+- Lightweight React frontend for embedding anywhere
+- Backend Node.js API, deployable on Render
+- Frontend deployable on Vercel
+- Error handling and caching headers implemented
+
+---
+
+## Tech Stack
+
+- **Backend:** Node.js, Express
+- **Frontend:** React + Vite
+- **Data Sources:** dictionaryapi.dev, CC-CEDICT
+- **Deployment:** Render (Backend), Vercel (Frontend)
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18 (or as specified in `.nvmrc`)
+- npm
+
+### Installation
+
 ```bash
-git add README.md
-git commit -m "Add initial project README"
+git clone https://github.com/eomeom/vocab-widget.git
+cd vocab-widget/api
+npm install
+npm start  # Runs backend locally
