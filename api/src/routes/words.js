@@ -4,30 +4,39 @@ const db = require("../db");
 
 const { convertPinyin } = require("../utils/pinyin");
 
+// In-memory cache for random word to reduce DB load
+let cachedRandom = null;
+let lastFetchTime = 0;
 
 // RANDOM WORD
 router.get("/random", (req, res) => {
-  try {
-    const language = req.query.language || "en";
-    const stmt = db.prepare(`
-      SELECT simplified, traditional, pinyin, definition
-      FROM words
-      WHERE language = ?
-      ORDER BY RANDOM()
-      LIMIT 1
-    `);
-    const word = stmt.get(language);
+  const now = Date.now();
+  const ONE_HOUR = 60 * 60 * 1000;
 
-    if (!word) return res.status(404).json({ error: "No word found" });
-
-    word.pinyin = convertPinyin(word.pinyin);
-    
-    res.json(word);
-
-  } catch (err) {
-    console.error("Random route error:", err);
-    res.status(500).json({ error: "Internal server error" });
+  if (cachedRandom && now - lastFetchTime < ONE_HOUR) {
+    return res.json(cachedRandom);
   }
+
+  const language = req.query.language || "zh";
+
+  const stmt = db.prepare(`
+    SELECT simplified, traditional, pinyin, definition
+    FROM words
+    WHERE language = ?
+    ORDER BY RANDOM()
+    LIMIT 1
+  `);
+
+  const word = stmt.get(language);
+
+  if (!word) return res.status(404).json({ error: "No word found" });
+
+  word.pinyin = convertPinyin(word.pinyin);
+
+  cachedRandom = word;
+  lastFetchTime = now;
+
+  res.json(word);
 });
 
 // SEARCH
