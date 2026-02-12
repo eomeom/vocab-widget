@@ -1,10 +1,20 @@
+const fs = require("fs");
 const path = require("path");
 const Database = require("better-sqlite3");
 
-const dbPath = path.join(__dirname, "../../data/vocab.db");
+// Path to database
+const dataDir = path.join(__dirname, "../data"); // relative to src/
+const dbPath = path.join(dataDir, "vocab.db");
 
-const db = new Database(dbPath);
+// Ensure folder exists
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+  console.log(`Created data directory at ${dataDir}`);
+}
 
-console.log("Connected to SQLite database.");
+// Open database (read-only recommended for deployment)
+const db = new Database(dbPath, { readonly: true });
+
+console.log("Connected to SQLite database:", dbPath);
 
 module.exports = db;
