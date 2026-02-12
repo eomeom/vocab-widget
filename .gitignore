@@ -3,8 +3,10 @@ node_modules
 api/node_modules
 
 # Database and dataset
-data/
+/data/
 *.db
+!api/data/vocab.db
+
 
 # Python cache
 __pycache__/
