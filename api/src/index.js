@@ -8,7 +8,16 @@ const wordsRoute = require("./routes/words");
 const app = express();
 // For Render to assign its own port
 const PORT = process.env.PORT || 3000;
-// const PORT = 3000;
+
+// Rate limiting middleware
+const rateLimit = require("express-rate-limit");
+
+const limiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 60, // 60 requests per minute per IP
+});
+
+app.use(limiter);
 
 
 // middleware
