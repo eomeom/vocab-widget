@@ -3,6 +3,7 @@
 const express = require("express");
 const cors = require("cors");
 const vocabRoute = require("./routes/vocab");
+const wordsRoute = require("./routes/words");
 
 const app = express();
 // For Render to assign its own port
@@ -21,7 +22,9 @@ app.get("/", (req, res) => {
 });
 
 // routes
-app.use("/vocab", vocabRoute);
+app.use("/vocab", vocabRoute);     // existing
+app.use("/words", wordsRoute);     // new
+
 
 // global health check
 app.get("/health", (req, res) => {

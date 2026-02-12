@@ -40,6 +40,9 @@ def main():
                     VALUES (?, ?, ?, ?, ?)
                 """, ("zh", simplified, traditional, pinyin, definition))
 
+                cursor.execute("CREATE INDEX IF NOT EXISTS idx_lang_freq ON words(language, frequency_rank)")
+
+
                 inserted += 1
 
                 if inserted % 10000 == 0:
