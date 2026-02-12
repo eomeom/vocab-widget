@@ -49,4 +49,13 @@ function convertPinyin(text) {
     .join(" ");
 }
 
-module.exports = { convertPinyin };
+function convertDefinitionPinyin(definition) {
+  return definition.replace(/\[([a-zü0-9\s]+)\]/gi, (match, pinyin) => {
+    const converted = convertPinyin(pinyin.trim());
+    return `(${converted})`;
+  });
+}
+
+// module.exports = { convertPinyin };
+module.exports = { convertPinyin, convertDefinitionPinyin };
+

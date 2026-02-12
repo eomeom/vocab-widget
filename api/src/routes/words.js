@@ -3,6 +3,8 @@ const router = express.Router();
 const db = require("../db");
 
 const { convertPinyin } = require("../utils/pinyin");
+const { convertPinyin, convertDefinitionPinyin } = require("../utils/pinyin");
+
 
 // In-memory cache for random word to reduce DB load
 let cachedRandom = null;
@@ -32,6 +34,7 @@ router.get("/random", (req, res) => {
   if (!word) return res.status(404).json({ error: "No word found" });
 
   word.pinyin = convertPinyin(word.pinyin);
+  word.definition = convertDefinitionPinyin(word.definition);
 
   cachedRandom = word;
   lastFetchTime = now;
@@ -65,6 +68,7 @@ router.get("/search", (req, res) => {
 
     results.forEach(word => {
       word.pinyin = convertPinyin(word.pinyin);
+      word.definition = convertDefinitionPinyin(word.definition);
     });
 
     res.json({ count: results.length, results });
