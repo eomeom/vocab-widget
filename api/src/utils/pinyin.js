@@ -12,15 +12,13 @@ function applyTone(syllable) {
   const match = syllable.match(/^([a-zü]+)([1-5])$/i);
   if (!match) return syllable;
 
-  let [_, base, tone] = match;
-  tone = parseInt(tone);
+  let base = match[1].toLowerCase();
+  let tone = parseInt(match[2]);
 
   // Neutral tone (5) → remove number only
   if (tone === 5) {
     return base;
   }
-
-  tone = tone - 1; // adjust to 0 index
 
   const vowels = ["a", "e", "o", "i", "u", "ü"];
   let vowelIndex = -1;
@@ -40,7 +38,7 @@ function applyTone(syllable) {
   if (vowelIndex === -1) return base;
 
   const vowel = base[vowelIndex];
-  const toned = toneMap[vowel][tone];
+  const toned = toneMap[vowel][tone - 1];
 
   return (
     base.slice(0, vowelIndex) +
@@ -49,33 +47,9 @@ function applyTone(syllable) {
   );
 }
 
-  // Priority rule
-  if (base.includes("a")) vowelIndex = base.indexOf("a");
-  else if (base.includes("e")) vowelIndex = base.indexOf("e");
-  else if (base.includes("ou")) vowelIndex = base.indexOf("o");
-  else {
-    for (let v of vowels) {
-      if (base.includes(v)) {
-        vowelIndex = base.indexOf(v);
-        break;
-      }
-    }
-  }
-
-  if (vowelIndex === -1) return base;
-
-  const vowel = base[vowelIndex];
-  const toned = toneMap[vowel][tone];
-
-  return (
-    base.slice(0, vowelIndex) +
-    toned +
-    base.slice(vowelIndex + 1)
-  );
-
 function convertPinyin(text) {
   return text
-    .split(" ")
+    .split(/\s+/)
     .map(applyTone)
     .join(" ");
 }
@@ -87,7 +61,4 @@ function convertDefinitionPinyin(definition) {
   });
 }
 
-
-
 module.exports = { convertPinyin, convertDefinitionPinyin };
-
