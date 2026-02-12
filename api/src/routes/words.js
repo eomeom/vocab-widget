@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../db");
 
-const { convertPinyin } = require("../utils/pinyin");
+// const { convertPinyin } = require("../utils/pinyin");
 const { convertPinyin, convertDefinitionPinyin } = require("../utils/pinyin");
 
 

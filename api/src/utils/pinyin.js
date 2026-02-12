@@ -56,6 +56,5 @@ function convertDefinitionPinyin(definition) {
   });
 }
 
-// module.exports = { convertPinyin };
 module.exports = { convertPinyin, convertDefinitionPinyin };
 
