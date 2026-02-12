@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const db = require("../db");
 
+const { convertPinyin } = require("../utils/pinyin");
+
+
 // RANDOM WORD
 router.get("/random", (req, res) => {
   try {
@@ -17,7 +20,10 @@ router.get("/random", (req, res) => {
 
     if (!word) return res.status(404).json({ error: "No word found" });
 
+    word.pinyin = convertPinyin(word.pinyin);
+    
     res.json(word);
+
   } catch (err) {
     console.error("Random route error:", err);
     res.status(500).json({ error: "Internal server error" });
@@ -48,7 +54,12 @@ router.get("/search", (req, res) => {
 
     const results = stmt.all(language, likeQ, likeQ, likeQ, likeQ);
 
+    results.forEach(word => {
+      word.pinyin = convertPinyin(word.pinyin);
+    });
+
     res.json({ count: results.length, results });
+    
   } catch (err) {
     console.error("Search route error:", err);
     res.status(500).json({ error: "Internal server error" });
